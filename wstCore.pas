@@ -123,7 +123,6 @@ implementation
             end;
         end;
 
-
     function compareDate(d1, d2 : Date) : integer;
         { SPESIFIKASI : Membandingkan dua tanggal d1 dan d2 dengan asumsi keduanya valid.
             Keluaran:
