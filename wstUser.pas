@@ -56,7 +56,7 @@ implementation
         { F.S. entri baru dengan nilai dari u pada baris paling bawah file f. }
         { ALGORITMA }
         begin
-            write(f, u._fullname, ',', u._address, ',', u._username, ',', u._password, ',', u._role, #10);
+            write(f, u._fullname, ',', u._address, ',', u._username, ',', u._password, ',', u._role, #13, #10);
         end;
 
     procedure UserSaveListToCSV(var f : text; ul : UserList);
@@ -69,7 +69,7 @@ implementation
         { ALGORITMA }
         begin
             { Baris pertama file adalah header }
-            write(f, 'Nama,Alamat,Username,Password,Role', #10);
+            write(f, 'Nama,Alamat,Username,Password,Role', #13, #10);
             { Proses pengulangan dengan jumlah pengulangan tertentu untuk mengisi file }
             for i := 1 to ul.Neff do begin
                 { Menulis data buku pada baris selanjutnya }

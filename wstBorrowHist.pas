@@ -58,7 +58,7 @@ implementation
         { F.S. entri baru dengan nilai dari bh pada baris paling bawah file f. }
         { ALGORITMA }
         begin
-            write(f, bh._username, ',', bh._id, ',', fromDate(bh._borrowDate), ',', fromDate(bh._dueDate), ',', bh._status, #10);
+            write(f, bh._username, ',', bh._id, ',', fromDate(bh._borrowDate), ',', fromDate(bh._dueDate), ',', bh._status, #13, #10);
         end;
 
     procedure BorrowHistSaveListToCSV(var f : text; bhl : BorrowHistList);
@@ -71,7 +71,7 @@ implementation
         { ALGORITMA }
         begin
             { Baris pertama file adalah header }
-            write(f, 'Username,ID_Buku,Tanggal_Peminjaman,Tanggal_Batas_Pengembalian,Status_Pengembalian', #10);
+            write(f, 'Username,ID_Buku,Tanggal_Peminjaman,Tanggal_Batas_Pengembalian,Status_Pengembalian', #13, #10);
             { Proses pengulangan dengan jumlah pengulangan tertentu untuk mengisi file }
             for i := 1 to bhl.Neff do begin
                 { Menulis data buku pada baris selanjutnya }

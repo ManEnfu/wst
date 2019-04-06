@@ -56,7 +56,7 @@ implementation
         { F.S. entri baru dengan nilai dari lr pada baris paling bawah file f. }
         { ALGORITMA }
         begin
-            write(f, lr._username, ',', lr._id, ',', fromDate(lr._reportDate), #10);
+            write(f, lr._username, ',', lr._id, ',', fromDate(lr._reportDate), #13, #10);
         end;
 
     procedure LostReportSaveListToCSV(var f : text; lrl : LostReportList);
@@ -69,7 +69,7 @@ implementation
         { ALGORITMA }
         begin
             { Baris pertama file adalah header }
-            write(f, 'Username,ID_Buku_Hilang,Tanggal_Laporan', #10);
+            write(f, 'Username,ID_Buku_Hilang,Tanggal_Laporan', #13, #10);
             { Proses pengulangan dengan jumlah pengulangan tertentu untuk mengisi file }
             for i := 1 to lrl.Neff do begin
                 { Menulis data buku pada baris selanjutnya }

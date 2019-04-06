@@ -56,7 +56,7 @@ implementation
         { F.S. entri baru dengan nilai dari rh pada baris paling bawah file f. }
         { ALGORITMA }
         begin
-            write(f, rh._username, ',', rh._id, ',', fromDate(rh._returnDate), #10);
+            write(f, rh._username, ',', rh._id, ',', fromDate(rh._returnDate), #13, #10);
         end;
 
     procedure ReturnHistSaveListToCSV(var f : text; rhl : ReturnHistList);
@@ -69,7 +69,7 @@ implementation
         { ALGORITMA }
         begin
             { Baris pertama file adalah header }
-            write(f, 'Username,ID_Buku,Tanggal_Pengembalian', #10);
+            write(f, 'Username,ID_Buku,Tanggal_Pengembalian', #13, #10);
             { Proses pengulangan dengan jumlah pengulangan tertentu untuk mengisi file }
             for i := 1 to rhl.Neff do begin
                 { Menulis data buku pada baris selanjutnya }

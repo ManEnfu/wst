@@ -90,7 +90,7 @@ implementation
             id2,title2,author2,qty2,year2,category2 }
         { ALGORITMA }
         begin
-            write(f, b._id, ',', b._title, ',', b._author, ',', b._qty, ',', b._year, ',', b._category, #10);
+            write(f, b._id, ',', b._title, ',', b._author, ',', b._qty, ',', b._year, ',', b._category, #13, #10);
         end;
 
     procedure BookSaveListToCSV(var f : text; bl : BookList);
@@ -103,7 +103,7 @@ implementation
         { ALGORITMA }
         begin
             { Baris pertama file adalah header }
-            write(f, 'ID_Buku,Judul_Buku,Author,Jumlah_Buku,Tahun_Penerbit,Kategori', #10);
+            write(f, 'ID_Buku,Judul_Buku,Author,Jumlah_Buku,Tahun_Penerbit,Kategori', #13, #10);
             { Proses pengulangan dengan jumlah pengulangan tertentu untuk mengisi file }
             for i := 1 to bl.Neff do begin
                 { Menulis data buku pada baris selanjutnya }
