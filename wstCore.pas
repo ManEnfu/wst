@@ -39,6 +39,11 @@ interface
             jika elemen tidak valid, i akan bernilai -1. }
         { I.S. f sudah dibuka dengan mode reset/read, delimiter terdefinisi. }
         { F.S. i bernilai elemen pertama yang dibaca jika valid (>= 0) dan bernilai -1 jika tidak valid (< 0). }
+    procedure readCSVDateDelim(var f : text; var d : date; delimiter : char);
+        { SPESIFIKASI : membaca elemen tanggal pada file csv f dengan dibatasi oleh
+            karakter delimiter dan menyimpannya ke Date d. }
+        { I.S. f sudah dibuka dengan mode reset/read, delimiter terdefinisi. }
+        { F.S. d bernilai elemen pertama yang dibaca. }
 
 implementation
     function isDateValid(d : Date) : boolean;
@@ -104,7 +109,8 @@ implementation
         end;
 
     function fromDate(d : Date) : string;
-        { SPESIFIKASI : Mengonversi format tanggal dari tipe data Date menjadi string 'DD/MM/YYYY' }
+        { SPESIFIKASI : Mengonversi format tanggal dari tipe data Date menjadi string 'DD/MM/YYYY'.
+            Jika masukan tidak valid keluaran akan berupa -1/-1/-1. }
         { KAMUS LOKAL }
         var
             sd, sm, sy : string;
@@ -169,7 +175,9 @@ implementation
             s := '';
             read(f, c);
             while (c <> delimiter) and not (eof(f)) do begin
-                s += c;
+                if (c <> #10) and (c <> #13) then begin { Periksa jika karakter bukan Carriage Return atau Line Feed }
+                    s += c;
+                end; { else do nothing }
                 read(f, c);
             end;
         end;
@@ -193,5 +201,19 @@ implementation
             if (err <> 0) or (i <= 0) then begin
                 i := -1;
             end; {else do nothing}
+        end;
+
+    procedure readCSVDateDelim(var f : text; var d : date; delimiter : char);
+        { SPESIFIKASI : membaca elemen tanggal pada file csv f dengan dibatasi oleh
+            karakter delimiter dan menyimpannya ke Date d. }
+        { I.S. f sudah dibuka dengan mode reset/read, delimiter terdefinisi. }
+        { F.S. d bernilai elemen pertama yang dibaca. }
+        { KAMUS LOKAL }
+        var
+            s : string;
+        { ALGORITMA }
+        begin
+            readCSVStrDelim(f, s, delimiter);
+            d := toDate(s);
         end;
 end.

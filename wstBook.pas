@@ -28,6 +28,10 @@ interface
     end;
 
     { Deklarasi fungsi/prosedur terkait Book dan BookList }
+    procedure BookAssign(var b : book; id : integer; title, author : string; qty, year : integer; ctg : string);
+        { SPESIFIKASI : Mengisi nilai pada Book b. }
+        { I.S. b terdeklarasi. }
+        { F.S. b terisi dengan nilai yang diberikan. }
     procedure BookWriteToCSV(var f : text; b : book);
         { SPESIFIKASI : Memasukkan entri Book b di file csv f. }
         { I.S. f dibuka dengan mode rewrite/write, b terdefinisi.
@@ -58,6 +62,20 @@ interface
         { F.S. bl berukuran n + 1 dengan elemen ke n + 1 adalah b. }
     
 implementation
+
+    procedure BookAssign(var b : book; id : integer; title, author : string; qty, year : integer; ctg : string);
+        { SPESIFIKASI : Mengisi nilai pada Book b. }
+        { I.S. b terdeklarasi. }
+        { F.S. b terisi dengan nilai yang diberikan. }
+        { ALGORITMA }
+        begin
+            b._id := id;
+            b._title := title;
+            b._author := author;
+            b._qty := qty;
+            b._year := year;
+            b._category := ctg;
+        end;
 
     procedure BookWriteToCSV(var f : text; b : book);
         { SPESIFIKASI : Memasukkan entri Book b di file csv f. }
@@ -123,7 +141,7 @@ implementation
             bl.Neff := 0;
             while (not eof(f)) and (bl.Neff < LIST_NMAX) do begin
                 BookReadFromCSV(f, b);
-                BookAppendList(bl, b)
+                BookAppendList(bl, b);
             end;
         end;
 
