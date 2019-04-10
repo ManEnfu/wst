@@ -1,7 +1,8 @@
 program wstMain;
 
-uses wstCore, wstBook, wstUser, wstBorrowHist, wstReturnHist, wstLostReport;
-
+uses wstCore, wstBook, wstUser, wstBorrowHist, wstReturnHist, wstLostReport,
+	wstFileDataSys;
+(*
 { F13 - Load File }
 procedure wstLoadFile(
 		var fb, fu, fbh, frh, flr : text;
@@ -52,6 +53,7 @@ procedure wstLoadFile(
 		reset(flr);
 		LostReportLoadListFromCSV(flr, lrl);
 		close(flr);
+		//BookStockCalc(bl, bhl, lrl);
 		writeln('[i] File perpustakaan berhasil dimuat!')
 	end;
 
@@ -161,7 +163,7 @@ procedure wstExit(
 			wstSaveFile(fb, fu, fbh, frh, flr, bl, ul, bhl, rhl, lrl);
 		end; {else do nothing}
 	end;
-
+*)
 var
 	fb, fu, fbh, frh, flr : text;
 	bl : BookList;
@@ -176,6 +178,7 @@ var
 	lr : LostReport;
 	i : integer;
 	s : string;
+	found : boolean;
 begin
 	writeln('\            ______________');
 	writeln(' \   \      /  /      |    ');
@@ -189,7 +192,7 @@ begin
 			wstLoadFile(fb, fu, fbh, frh, flr, bl, ul, bhl, rhl, lrl);
 			for i := 1 to bl.Neff do begin
 				b := bl.t[i];
-				writeln(b._id, ' | ', b._title, ' | ', b._author, ' | ', b._qty, ' | ', b._year, ' | ', b._category);
+				writeln(b._id, ' | ', b._title, ' | ', b._author, ' | ', b._qty, ' | ', b._stock, ' | ', b._year, ' | ', b._category);
 			end;
 			writeln(' ');
 			for i := 1 to ul.Neff do begin
@@ -211,6 +214,14 @@ begin
 				lr := lrl.t[i];
 				writeln(lr._username, ',', lr._id, ',', fromDate(lr._reportDate));
 			end;
+		end else if (s = 'find') then begin
+			readln(i);
+			BookSearchByID(bl, i, b, found);
+			if (found) then begin
+				writeln(b._id, ' | ', b._title, ' | ', b._author, ' | ', b._qty, ' | ', b._stock, ' | ', b._year, ' | ', b._category);
+			end else begin
+				writeln('not found');
+			end;
 		end else if (s = 'save') then begin
 			wstSaveFile(fb, fu, fbh, frh, flr, bl, ul, bhl, rhl, lrl);
 		end else if (s = 'carianggota') then begin
@@ -221,4 +232,4 @@ begin
 
 		end;
 	until (s = 'keluar');
-end.
+end.d

@@ -12,7 +12,7 @@ interface
     }
     type LostReport = record
         _id : integer;
-        _username : string;
+        _username, _title : string;
         _reportDate : Date;
     end;
 
@@ -119,4 +119,5 @@ implementation
                 lrl.t[lrl.Neff] := lr;
             end;
         end;
+
 end.

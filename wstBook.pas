@@ -3,18 +3,19 @@ unit wstBook;
 { Unit wstBook mendefinisikan tipe data Book, Booklist, fungsi, dan prosedur yang terkait. }
 
 interface
-    uses wstCore;
+    uses wstCore, wstBorrowHist, wstLostReport;
 
     { Tipe data Book adalah representasi dengan variabel anggota :
         _id         : id buku (numerik)
         _title      : judul buku
         _author     : penulis
         _qty        : jumlah buku (termasuk yang dipinjam)
+        _stock      : jumlah buku yang tersedia
         _year       : tahun terbit
         _category   : kategori buku
     }
     type Book = record
-        _id, _qty, _year : integer;
+        _id, _qty, _stock, _year : integer;
         _title, _author, _category : string;
     end;
 
@@ -60,9 +61,14 @@ interface
             b diletakkan di elemen terakhir bl jika array belum penuh. }
         { I.S. bl berukuran n }
         { F.S. bl berukuran n + 1 dengan elemen ke n + 1 adalah b. }
-    
-implementation
+    //procedure BookStockCalc(var bl : BookList; bhl : BorrowList; lrl : LostReportList);
+    procedure BookSearchByID(bl : BookList; id : integer; var b : Book; var found : boolean);
+        { SPESIFIKASI : Mengembalikan tipe data Book jika ditemukan buku dengan id tertentu.
+            Jika tidak ditemukan fungsi akan mengembalikan nil. }
 
+    
+
+implementation
     procedure BookAssign(var b : book; id : integer; title, author : string; qty, year : integer; ctg : string);
         { SPESIFIKASI : Mengisi nilai pada Book b. }
         { I.S. b terdeklarasi. }
@@ -123,6 +129,7 @@ implementation
             readCSVUIntDelim(f, b._qty, ',');
             readCSVUIntDelim(f, b._year, ',');
             readCSVStrDelim(f, b._category, #10);
+            b._stock := b._qty;
         end;
 
     procedure BookLoadListFromCSV(var f : text; var bl : BookList);
@@ -156,4 +163,23 @@ implementation
                 bl.t[bl.Neff] := b;
             end;
         end;
+
+    procedure BookSearchByID(bl : BookList; id : integer; var b : Book; var found : boolean);
+        { SPESIFIKASI : Mengembalikan tipe data Book jika ditemukan buku dengan id tertentu.
+            Jika tidak ditemukan fungsi akan mengembalikan nil. }
+        var
+            i : integer;
+        begin
+            i := 1;
+            while (bl.t[i]._id <> id) and (i < bl.Neff) do begin
+                i += 1;
+            end;
+            if (bl.t[i]._id = id) then begin
+                b := bl.t[i];
+                found := true;
+            end else begin { id <> bl.t[i]._id }
+                found := false;
+            end;
+        end;
+
 end.
