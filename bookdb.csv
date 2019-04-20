@@ -1,4 +1,7 @@
 ID_Buku,Judul_Buku,Author,Jumlah_Buku,Tahun_Penerbit,Kategori
-234,Sakadang Kancil,Ujang,172,2243,manga
-376,Test,K,1,2248,programming
-344,Bukan Buku,Manusia,23,2245,sastra
+"234","Sakadang Kancil","Ujang","178","2243","manga"
+"376","Test","K","453","2248","programming"
+"344","Bukan Buku","Manusia","23","2245","sastra"
+"746","12003","qwerty","41","3624","sejarah"
+"178","GTS3","eprom","932","3999","manga"
+"287","Assembly Language for Embryos","WST","1","987","programming"

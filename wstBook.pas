@@ -3,7 +3,7 @@ unit wstBook;
 { Unit wstBook mendefinisikan tipe data Book, Booklist, fungsi, dan prosedur yang terkait. }
 
 interface
-    uses wstCore, wstBorrowHist, wstLostReport;
+    uses wstCore;
 
     { Tipe data Book adalah representasi dengan variabel anggota :
         _id         : id buku (numerik)
@@ -62,11 +62,12 @@ interface
         { I.S. bl berukuran n }
         { F.S. bl berukuran n + 1 dengan elemen ke n + 1 adalah b. }
     //procedure BookStockCalc(var bl : BookList; bhl : BorrowList; lrl : LostReportList);
-    procedure BookSearchByID(bl : BookList; id : integer; var b : Book; var found : boolean);
-        { SPESIFIKASI : Mengembalikan tipe data Book jika ditemukan buku dengan id tertentu.
-            Jika tidak ditemukan fungsi akan mengembalikan nil. }
-
-    
+    procedure BookSearchByID(bl : BookList; id : integer; var b : Book; var i : integer; var found : boolean);
+        { SPESIFIKASI : Mencari buku dengan id yang ditentukan. Jika ditemukan, b akan bernilai buku yang ditemukan,
+            i bernilai indeks buku pada BookList bl, dan found bernilai true. Jika tidak  ditemukan, found akan
+            bernilai false. }
+        { I.S. bl dan id terdefinisi. }
+        { F.S. b, i terdefinisi dan found = true jika ditemukan, found = false juka tidak ditemukan. }
 
 implementation
     procedure BookAssign(var b : book; id : integer; title, author : string; qty, year : integer; ctg : string);
@@ -96,7 +97,7 @@ implementation
             id2,title2,author2,qty2,year2,category2 }
         { ALGORITMA }
         begin
-            write(f, b._id, ',', b._title, ',', b._author, ',', b._qty, ',', b._year, ',', b._category, #13, #10);
+            write(f, '"', b._id, '","', b._title, '","', b._author, '","', b._qty, '","', b._year, '","', b._category, '"', #13, #10);
         end;
 
     procedure BookSaveListToCSV(var f : text; bl : BookList);
@@ -157,6 +158,7 @@ implementation
             b diletakkan di elemen terakhir bl jika array belum penuh. }
         { I.S. bl berukuran n }
         { F.S. bl berukuran n + 1 dengan elemen ke n + 1 adalah b. }
+        { ALGORITMA }
         begin
             if (bl.Neff < LIST_NMAX) then begin
                 bl.Neff += 1;
@@ -164,11 +166,13 @@ implementation
             end;
         end;
 
-    procedure BookSearchByID(bl : BookList; id : integer; var b : Book; var found : boolean);
-        { SPESIFIKASI : Mengembalikan tipe data Book jika ditemukan buku dengan id tertentu.
-            Jika tidak ditemukan fungsi akan mengembalikan nil. }
-        var
-            i : integer;
+    procedure BookSearchByID(bl : BookList; id : integer; var b : Book; var i : integer; var found : boolean);
+        { SPESIFIKASI : Mencari buku dengan id yang ditentukan. Jika ditemukan, b akan bernilai buku yang ditemukan,
+            i bernilai indeks buku pada BookList bl, dan found bernilai true. Jika tidak  ditemukan, found akan
+            bernilai false. }
+        { I.S. bl dan id terdefinisi. }
+        { F.S. b, i terdefinisi dan found = true jika ditemukan, found = false juka tidak ditemukan. }
+        { ALGORITMA }
         begin
             i := 1;
             while (bl.t[i]._id <> id) and (i < bl.Neff) do begin
@@ -181,5 +185,4 @@ implementation
                 found := false;
             end;
         end;
-
 end.

@@ -47,6 +47,9 @@ interface
             u diletakkan di elemen terakhir ul jika array belum penuh. }
         { I.S. ul berukuran n }
         { F.S. ul berukuran n + 1 dengan elemen ke n + 1 adalah u. }
+    procedure UserSearchByUname(ul : UserList; uname: string; var u : User; var found : boolean);
+        { SPESIFIKASI : Mengembalikan tipe data Book jika ditemukan buku dengan id tertentu.
+            Jika tidak ditemukan fungsi akan mengembalikan nil. }
     
 implementation
 
@@ -56,7 +59,7 @@ implementation
         { F.S. entri baru dengan nilai dari u pada baris paling bawah file f. }
         { ALGORITMA }
         begin
-            write(f, u._fullname, ',', u._address, ',', u._username, ',', u._password, ',', u._role, #13, #10);
+            write(f, '"', u._fullname, '","', u._address, '","', u._username, '","', u._password, '","', u._role, '"', #13, #10);
         end;
 
     procedure UserSaveListToCSV(var f : text; ul : UserList);
@@ -119,6 +122,24 @@ implementation
             if (ul.Neff < LIST_NMAX) then begin
                 ul.Neff += 1;
                 ul.t[ul.Neff] := u;
+            end;
+        end;
+
+    procedure UserSearchByUname(ul : UserList; uname: string; var u : User; var found : boolean);
+        { SPESIFIKASI : Mengembalikan tipe data Book jika ditemukan buku dengan id tertentu.
+            Jika tidak ditemukan fungsi akan mengembalikan nil. }
+        var
+            i : integer;
+        begin
+            i := 1;
+            while (uname <> ul.t[i]._username) and (i < ul.Neff) do begin
+                i += 1;
+            end;
+            if (uname = ul.t[i]._username) then begin
+                u := ul.t[i];
+                found := true;
+            end else begin { uname <> ul.t[i]._username }
+                found := false;
             end;
         end;
 end.

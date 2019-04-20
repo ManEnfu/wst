@@ -3,6 +3,7 @@ unit wstCore;
 { Unit wstCore mendefinisikan tipe data, konstanta, fungsi, dan prosedur umumm yang digunakan. }
 
 interface
+    uses crt;
     { Konstanta }
     const
         LIST_NMAX = 256;
@@ -26,6 +27,10 @@ interface
              1 : d1 > d2 
              0 : d1 = d2
             -1 : d1 < d2 }
+    function addDate(d1 : Date; x : integer) : Date;
+        { SPESIFIKASI : Mengembalikan tanggal x hari setelah tanggal d1. }
+    function subDate(d1, d2 : Date) : integer;
+        { SPESIFIKASI : Mengembalikan selisih hari dari dua tanggal d1 dan d2. }
 
     { Deklarasi fungsi pembacaan file CSV }
     procedure readCSVStrDelim(var f : text; var s : string; delimiter : char);
@@ -44,8 +49,33 @@ interface
             karakter delimiter dan menyimpannya ke Date d. }
         { I.S. f sudah dibuka dengan mode reset/read, delimiter terdefinisi. }
         { F.S. d bernilai elemen pertama yang dibaca. }
+    procedure readPass(var s : string);
 
 implementation
+    function isLeapYear(y : integer) : boolean;
+        begin
+            isLeapYear := ((y mod 4 = 0) and (y mod 100 <> 0)) or (y mod 400 = 0);
+        end;
+
+    function maxDayOfMonth(m : integer; y : integer) : integer;
+        begin
+            { Bulan dengan jumlah hari 31? }
+            if (m = 1) or (m = 3) or (m = 5) or (m = 7) or (m = 8) or (m = 10) or (m = 12) then begin
+                maxDayOfMonth := 31
+            { Bulan dengan jumlah hari 30? }
+            end else if (m = 4) or (m = 6) or (m = 9) or (m = 11) then begin
+                maxDayOfMonth := 30
+            { Bulan Februari? }
+            end else if (m = 2) then begin
+                { Tahun Kabisat? }
+                if (isLeapYear(y)) then begin
+                    maxDayOfMonth := 29;
+                end else begin {((y mod 4 <> 0) or (y mod 100 = 0)) and (y mod 400 <> 0)}
+                    maxDayOfMonth := 28;
+                end;        
+            end;
+        end;
+
     function isDateValid(d : Date) : boolean;
         { SPESIFIKASI : Menentukan apakah tanggal valid. }
         { ALGORITMA }
@@ -53,19 +83,8 @@ implementation
             { Tahun valid? }
             if (d.y >= 0) and (d.y <= 9999) then begin
                 { Bulan dengan jumlah hari 31? }
-                if (d.m = 1) or (d.m = 3) or (d.m = 5) or (d.m = 7) or (d.m = 8) or (d.m = 10) or (d.m = 12) then begin
-                    isDateValid := (d.d >= 1) and (d.d <= 31);
-                { Bulan dengan jumlah hari 30? }
-                end else if (d.m = 4) or (d.m = 6) or (d.m = 9) or (d.m = 11) then begin
-                    isDateValid := (d.d >= 1) and (d.d <= 30);
-                { Bulan Februari? }
-                end else if (d.m = 2) then begin
-                    { Tahun Kabisat? }
-                    if ((d.y mod 4 = 0) and (d.y mod 100 <> 0)) or (d.y mod 400 = 0) then begin
-                        isDateValid := (d.d >= 1) and (d.d <= 29);
-                    end else begin {((d.y mod 4 <> 0) or (d.y mod 100 = 0)) and (d.y mod 400 <> 0)}
-                        isDateValid := (d.d >= 1) and (d.d <= 28);
-                    end;
+                if (d.m >=  1) and (d.m <= 12) then begin
+                    isDateValid := (d.d >= 1) and (d.d <= maxDayOfMonth(d.m, d.y));
                 end else begin { bulan tidak valid }
                     isDateValid := false;
                 end;
@@ -159,6 +178,83 @@ implementation
             end;
         end;
 
+    function addDate(d1 : Date; x : integer) : Date;
+        var
+            d : Date;
+            stop : boolean;
+            md : integer;
+        begin
+            d := d1;
+            d.d += x;
+            stop := false;
+            repeat
+                if (isLeapYear(d.y)) then begin
+                    if (d.d > 366) then begin
+                        d.y += 1;
+                        d.d -= 366;
+                    end else begin
+                        stop := true;
+                    end;
+                end else begin { not isLeapYear(d) }
+                    if  (d.d > 365) then begin
+                        d.y += 1;
+                        d.d -= 365;
+                    end else begin
+                        stop := true;
+                    end;
+                end;
+            until stop;
+            stop := false;
+            repeat
+                md := maxDayOfMonth(d.m, d.y);
+                if (d.d > md) then begin
+                    d.m += 1;
+                    if (d.m = 13) then begin
+                        d.m := 1;
+                        d.y += 1;
+                    end;
+                    d.d -= md;
+                end else begin
+                    stop := true;
+                end;
+            until stop;
+            addDate := d; 
+        end;
+
+    function subDate(d1, d2 : Date) : integer;
+        var
+            d, i : integer;  
+        begin
+            d := d1.d - d2.d;
+            if (d1.m > d2.m) then begin
+                for i := d2.m to (d1.m - 1) do begin
+                    d += maxDayOfMonth(i, d2.y);
+                end;
+            end else if (d1.m < d2.m) then begin
+                for i := d1.m to (d2.m - 1) do begin
+                    d -= maxDayOfMonth(i, d2.y);
+                end;
+            end; { else do nothing }
+            if (d1.y > d2.y) then begin
+                for i := d2.y to (d1.y - 1) do begin
+                    if (isLeapYear(i)) then begin
+                        d += 366;
+                    end else begin { not isLeapYear(i) }
+                        d += 355;
+                    end;
+                end;
+            end else if (d1.m < d2.m) then begin
+                for i := d1.m to (d2.m - 1) do begin
+                    if (isLeapYear(i)) then begin
+                        d -= 366;
+                    end else begin { not isLeapYear(i) }
+                        d -= 355;
+                    end;
+                end;
+            end; { else do nothing }
+            subDate := d;
+        end;
+
     procedure readCSVStrDelim(var f : text; var s : string; delimiter : char);
         { SPESIFIKASI : membaca elemen string pada file csv f dengan dibatasi oleh 
             karakter delimiter dan menyimpannya ke string s. }
@@ -167,15 +263,21 @@ implementation
         { KAMUS LOKAL }
         var
             c : char;
+            esc : boolean;
         { ALGORITMA }
         begin
             { Proses sekuensial dengan MARK (MARK = delimiter atau eof) untuk membaca karakter 
                 satu persatu, dan memasukkan karakter tersebut ke string s selama karakter 
                 bukan delimiter dan belum mencapai akhir file/eof. }
             s := '';
-            read(f, c);
-            while (c <> delimiter) and not (eof(f)) do begin
-                if (c <> #10) and (c <> #13) then begin { Periksa jika karakter bukan Carriage Return atau Line Feed }
+            esc := false;
+            if not (eof(f)) then begin
+                read(f, c);
+            end;
+            while ((c <> delimiter) or (esc)) and not (eof(f)) do begin
+                if (c = '"') then begin
+                    esc := not esc; 
+                end else if (c <> #10) and (c <> #13) then begin { Periksa jika karakter bukan tanda petik, Carriage Return atau Line Feed }
                     s += c;
                 end; { else do nothing }
                 read(f, c);
@@ -216,4 +318,27 @@ implementation
             readCSVStrDelim(f, s, delimiter);
             d := toDate(s);
         end;
+
+    
+    procedure readPass(var s : string);
+        var
+            ch : char;
+        begin
+            s := '';
+            repeat
+            ch := readKey;
+            
+            if (ch >= #32) and (ch <= #126) then begin
+                s += ch;
+                write('*');
+            end else if (ch = #8) and (length(s) >= 1) then begin
+                s := copy(s, 1, length(s) - 1);
+                write(#8, ' ', #8);
+            end;
+            until (ch = #13);
+            write(#13, #10);
+        end;
+
+
+
 end.

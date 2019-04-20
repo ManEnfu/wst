@@ -3,7 +3,7 @@ unit wstReturnHist;
 { Unit wstReturnHist mendefinisikan tipe data ReturnHist, ReturnHistlist, fungsi, dan prosedur yang terkait. }
 
 interface
-    uses wstCore;
+    uses wstCore, wstBook;
 
     { Tipe data ReturnHist adalah representasi histori peminjaman buku dengan variabel anggota :
         _username   : username peminjam
@@ -47,7 +47,7 @@ interface
             rh diletakkan di elemen terakhir rhl jika array belum penuh. }
         { I.S. rhl berukuran n }
         { F.S. rhl berukuran n + 1 dengan elemen ke n + 1 adalah rh. }
-    
+
 implementation
 
     procedure ReturnHistWriteToCSV(var f : text; rh : ReturnHist);
@@ -56,7 +56,7 @@ implementation
         { F.S. entri baru dengan nilai dari rh pada baris paling bawah file f. }
         { ALGORITMA }
         begin
-            write(f, rh._username, ',', rh._id, ',', fromDate(rh._returnDate), #13, #10);
+            write(f, '"', rh._username, '","', rh._id, '","', fromDate(rh._returnDate), '"',#13, #10);
         end;
 
     procedure ReturnHistSaveListToCSV(var f : text; rhl : ReturnHistList);
@@ -113,6 +113,7 @@ implementation
             rh diletakkan di elemen terakhir rhl jika array belum penuh. }
         { I.S. rhl berukuran n }
         { F.S. rhl berukuran n + 1 dengan elemen ke n + 1 adalah rh. }
+        { ALGORITMA }
         begin
             if (rhl.Neff < LIST_NMAX) then begin
                 rhl.Neff += 1;

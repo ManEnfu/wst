@@ -3,7 +3,7 @@ unit wstLostReport;
 { Unit wstLostReport mendefinisikan tipe data LostReport, LostReportlist, fungsi, dan prosedur yang terkait. }
 
 interface
-    uses wstCore;
+    uses wstCore, wstBook;
 
     { Tipe data LostReport adalah representasi laporan kehilangan buku dengan variabel anggota :
         _username   : username pelapor
@@ -47,7 +47,7 @@ interface
             lr diletakkan di elemen terakhir lrl jika array belum penuh. }
         { I.S. lrl berukuran n }
         { F.S. lrl berukuran n + 1 dengan elemen ke n + 1 adalah lr. }
-    
+
 implementation
 
     procedure LostReportWriteToCSV(var f : text; lr : LostReport);
@@ -56,7 +56,7 @@ implementation
         { F.S. entri baru dengan nilai dari lr pada baris paling bawah file f. }
         { ALGORITMA }
         begin
-            write(f, lr._username, ',', lr._id, ',', fromDate(lr._reportDate), #13, #10);
+            write(f, '"', lr._username, '","', lr._id, '","', fromDate(lr._reportDate), '"', #13, #10);
         end;
 
     procedure LostReportSaveListToCSV(var f : text; lrl : LostReportList);
@@ -113,11 +113,11 @@ implementation
             lr diletakkan di elemen terakhir lrl jika array belum penuh. }
         { I.S. lrl berukuran n }
         { F.S. lrl berukuran n + 1 dengan elemen ke n + 1 adalah lr. }
+        { ALGORITMA }
         begin
             if (lrl.Neff < LIST_NMAX) then begin
                 lrl.Neff += 1;
                 lrl.t[lrl.Neff] := lr;
             end;
         end;
-
 end.

@@ -49,6 +49,16 @@ interface
             bh diletakkan di elemen terakhir bhl jika array belum penuh. }
         { I.S. bhl berukuran n }
         { F.S. bhl berukuran n + 1 dengan elemen ke n + 1 adalah bh. }
+    procedure BorrowHistSearchByIDUserStatus(
+            bhl : BorrowHistList; id : integer; uname : string; s : string;
+            var bh : BorrowHist; var i : integer; var found : boolean
+        );
+        { SPESIFIKASI : Mencari riwayat peminjaman buku dengan id dan username peminjam yang ditentukan. 
+            Jika ditemukan, bh akan bernilai riwayat peminjaman buku yang ditemukan,
+            i bernilai indeks riwayat pada BorrowListList bhl, dan found bernilai true. Jika tidak  ditemukan, found akan
+            bernilai false. }
+        { I.S. bhl, id, dan uname terdefinisi. }
+        { F.S. bh, i terdefinisi dan found = true jika ditemukan, found = false juka tidak ditemukan. }
     
 implementation
 
@@ -58,7 +68,7 @@ implementation
         { F.S. entri baru dengan nilai dari bh pada baris paling bawah file f. }
         { ALGORITMA }
         begin
-            write(f, bh._username, ',', bh._id, ',', fromDate(bh._borrowDate), ',', fromDate(bh._dueDate), ',', bh._status, #13, #10);
+            write(f, '"', bh._username, '","', bh._id, '","', fromDate(bh._borrowDate), '","', fromDate(bh._dueDate), '","', bh._status, '"', #13, #10);
         end;
 
     procedure BorrowHistSaveListToCSV(var f : text; bhl : BorrowHistList);
@@ -117,10 +127,35 @@ implementation
             bh diletakkan di elemen terakhir bhl jika array belum penuh. }
         { I.S. bhl berukuran n }
         { F.S. bhl berukuran n + 1 dengan elemen ke n + 1 adalah bh. }
+        { ALGORITMA }
         begin
             if (bhl.Neff < LIST_NMAX) then begin
                 bhl.Neff += 1;
                 bhl.t[bhl.Neff] := bh;
+            end;
+        end;
+
+    procedure BorrowHistSearchByIDUserStatus(
+            bhl : BorrowHistList; id : integer; uname : string; s : string;
+            var bh : BorrowHist; var i : integer; var found : boolean
+        );
+        { SPESIFIKASI : Mencari riwayat peminjaman buku dengan id dan username peminjam yang ditentukan. 
+            Jika ditemukan, bh akan bernilai riwayat peminjaman buku yang ditemukan,
+            i bernilai indeks riwayat pada BorrowListList bhl, dan found bernilai true. Jika tidak  ditemukan, found akan
+            bernilai false. }
+        { I.S. bhl, id, dan uname terdefinisi. }
+        { F.S. bh, i terdefinisi dan found = true jika ditemukan, found = false juka tidak ditemukan. }
+        { ALGORITMA }
+        begin
+            i := 1;
+            while ((bhl.t[i]._id <> id) or (bhl.t[i]._username <> uname) or (bhl.t[i]._status <> s)) and (i < bhl.Neff) do begin
+                i += 1;
+            end;
+            if (bhl.t[i]._id = id) and (bhl.t[i]._username = uname) and (bhl.t[i]._status = s) then begin
+                bh := bhl.t[i];
+                found := true;
+            end else begin { (bhl.t[i]._id <> id) or (bhl.t[i]._username <> uname) or (bhl.t[i]._status <> s) }
+                found := false;
             end;
         end;
 end.
