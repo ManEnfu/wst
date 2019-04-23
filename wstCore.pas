@@ -50,6 +50,7 @@ interface
         { I.S. f sudah dibuka dengan mode reset/read, delimiter terdefinisi. }
         { F.S. d bernilai elemen pertama yang dibaca. }
     procedure readPass(var s : string);
+    function encryptPass(s : string) : string;
 
 implementation
     function isLeapYear(y : integer) : boolean;
@@ -179,10 +180,13 @@ implementation
         end;
 
     function addDate(d1 : Date; x : integer) : Date;
+        { SPESIFIKASI : Mengembalikan tanggal x hari setelah tanggal d1. }
+        { KAMUS LOKAL }
         var
             d : Date;
             stop : boolean;
             md : integer;
+        { ALGORITMA }
         begin
             d := d1;
             d.d += x;
@@ -222,8 +226,11 @@ implementation
         end;
 
     function subDate(d1, d2 : Date) : integer;
+        { SPESIFIKASI : Mengembalikan selisih hari dari dua tanggal d1 dan d2. }
+        { KAMUS LOKAL }
         var
-            d, i : integer;  
+            d, i : integer;
+        { ALGORITMA }  
         begin
             d := d1.d - d2.d;
             if (d1.m > d2.m) then begin
@@ -321,6 +328,10 @@ implementation
 
     
     procedure readPass(var s : string);
+        { SPESIFIKASI : membaca input string dengan menyembunyikan string input kemudian 
+            mengenkripsi string tersebut. }
+        { I.S. - }
+        { F.S. string dienkripsi dan disimpan di variabel s. }
         var
             ch : char;
         begin
@@ -337,8 +348,98 @@ implementation
             end;
             until (ch = #13);
             write(#13, #10);
+            s := encryptPass(s);
         end;
 
-
-
+    function encryptPass(s : string) : string;
+        { SPESIFIKASI : mengembalikan string hasil enkripsi string s menggunakan base64. }
+        { KAMUS LOKAL }
+        var
+            b64 : array [1..64] of char = (
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+                'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 
+                'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+                'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+                'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+                'w', 'x', 'y', 'z', '0', '1', '2', '3',
+                '4', '5', '6', '7', '8', '9', '+', '/' 
+            );
+            b, e : string;
+            o, i, j, eb : integer;
+        { ALGORITMA }
+        begin
+            e := '';
+            b := '';
+            for i := 1 to length(s) do begin
+                o := ord(s[i]);
+                if (o >= 128) then begin
+                    b += '1';
+                    o -= 128;
+                end else begin
+                    b += '0';
+                end;
+                if (o >= 64) then begin
+                    b += '1';
+                    o -= 64;
+                end else begin
+                    b += '0';
+                end;
+                if (o >= 32) then begin
+                    b += '1';
+                    o -= 32;
+                end else begin
+                    b += '0';
+                end;
+                if (o >= 16) then begin
+                    b += '1';
+                    o -= 16;
+                end else begin
+                    b += '0';
+                end;
+                if (o >= 8) then begin
+                    b += '1';
+                    o -= 8;
+                end else begin
+                    b += '0';
+                end;
+                if (o >= 4) then begin
+                    b += '1';
+                    o -= 4;
+                end else begin
+                    b += '0';
+                end;
+                if (o >= 2) then begin
+                    b += '1';
+                    o -= 2;
+                end else begin
+                    b += '0';
+                end;
+                if (o >= 1) then begin
+                    b += '1';
+                    o -= 1;
+                end else begin
+                    b += '0';
+                end;
+            end;
+            i := 1;
+            while  (i <= length(b)) do begin
+                eb := 0;
+                for j := 1 to 6 do begin
+                    eb *= 2;
+                    if (i <= length(b)) then begin
+                        if (b[i] = '1') then begin
+                            eb += 1;
+                        end else begin
+                            eb += 0;
+                        end;
+                    end else begin
+                        eb += 0;
+                    end;
+                    i += 1;
+                end;
+                e += b64[eb + 1];
+            end;
+            encryptPass := e;
+        end;
 end.

@@ -150,12 +150,17 @@ var
     i : integer;
     s : string;
     isLogged: boolean;
+{ ALGORITMA }
 begin
+    { Inisialisasi }
     s := '';
     isLogged := false;
+    { Menampilkan menu. }
     wstDispLogo();
     window(34, 1, 80, 25);
+    { Program akan memuat file terlebih dahulu }
     wstLoadFile(fb, fu, fbh, frh, flr, bl, ul, bhl, rhl, lrl);
+    { Loop untuk menerima pilihan menu dan mengeksekusi fungsionalitas sesuai pilihan menu }
     repeat
         wstDispLogin(isLogged, loggedUser);
         wstDispMainMenu(s, isLogged, loggedUser);
@@ -194,7 +199,6 @@ begin
         end else  if (s = 'keluar') then begin
             wstExit(fb, fu, fbh, frh, flr, bl, ul, bhl, rhl, lrl);
         end else begin
-
         end;
-    until (s = 'keluar');
+    until (s = 'keluar'); { s = 'keuar', dipilih menu keluar, loop berhenti dan program keluar. }
 end.
