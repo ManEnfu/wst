@@ -179,7 +179,7 @@ begin
         end else if (s = 'kembalikan buku') then begin
             wstReturnBook(bl, bhl, rhl, loggedUser);
         end else if (s = 'lapor buku hilang') then begin
-            wstReportLostBook(bl, lrl, loggedUser);
+            wstReportLostBook(bl, bhl, lrl, loggedUser);
         end else if (s = 'lihat laporan') then begin
             wstListLostReports(lrl, bl);
         end else if (s = 'tambah buku') then begin

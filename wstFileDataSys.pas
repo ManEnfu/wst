@@ -3,7 +3,7 @@ unit wstFileDataSys;
 interface 
     uses wstCore, wstBook, wstUser, wstBorrowHist, wstReturnHist, wstLostReport;
     function isKatValid(x : char):boolean;
-    procedure wstBookStockProc(var bl : BookList; bhl : BorrowHistList; lrl : LostReportList);
+    procedure wstBookStockProc(var bl : BookList; bhl : BorrowHistList);
     { F01 - Registrasi }
     procedure wstRegister(var ul : UserList);
     { F02 - Login }
@@ -24,7 +24,7 @@ interface
     procedure wstReturnBook (var Tabbook : BookList; var TabBorrowHist : BorrowHistList; var TabReturnHist : ReturnHistList; loggedUser : User);
     
     { F07 - Melaporkan buku  hilang }
-    procedure wstReportLostBook(var bl : BookList; var listHilang : LostReportList; loggedUser : User);
+    procedure wstReportLostBook(var bl : BookList; var bhl : BorrowHistList; var listHilang : LostReportList; loggedUser : User);
         { SPESIFIKASI : membaca variabel listHilang bertipe LostReportList, dan variabel listBuku bertipe BookList}
         { I.S. menerima variabel id, title, tanggal pada LostReportList }
         { F.S. menuliskan output variabel id, title, dan tanggal pada LostReportList }
@@ -109,21 +109,16 @@ implementation
         else isKatValid := false
     end;
 
-    procedure wstBookStockProc(var bl : BookList; bhl : BorrowHistList; lrl : LostReportList);
+    procedure wstBookStockProc(var bl : BookList; bhl : BorrowHistList);
         var
             i, j : integer;
         begin
             for i := 1 to bl.Neff do begin
                 bl.t[i]._stock := bl.t[i]._qty;
                 for j := 1 to bhl.Neff do begin
-                    if (bl.t[i]._id = bhl.t[j]._id) and (bhl.t[j]._status = 'belum') then begin
+                    if (bl.t[i]._id = bhl.t[j]._id) and (bhl.t[j]._status <> 'sudah') then begin
                         bl.t[i]._stock -= 1;
-                    end;
-                end;
-                for j := 1 to lrl.Neff do begin
-                    if (bl.t[i]._id = lrl.t[j]._id) then begin
-                        bl.t[i]._stock -= 1;
-                    end;
+                    end; { else do nothing }
                 end;
             end;
         end;
@@ -385,32 +380,41 @@ implementation
         end;
 
     { F07 - Melaporkan buku  hilang }
-    procedure wstReportLostBook(var bl : BookList; var listHilang : LostReportList; loggedUser : User);
+    procedure wstReportLostBook(var bl : BookList; var bhl : BorrowHistList; var listHilang : LostReportList; loggedUser : User);
         { SPESIFIKASI : membaca variabel listHilang bertipe LostReportList, dan variabel listBuku bertipe BookList}
             { I.S. menerima variabel id, title, tanggal pada LostReportList }
             { F.S. menuliskan output variabel id, title, dan tanggal pada LostReportList }
         { KAMUS LOKAL }
         var
-        title, tanggal : string;
-        id : integer;
+        tanggal : string;
+        id, ib, ibh : integer;
         lr : lostReport;
-        //b : book;
+        bh : BorrowHist;
+        b : book;
+        found1, found2 : boolean;
         { ALGORITMA }
         begin
         {Memasukkan input data laporan kehilangan}
             {Input ID Buku}
             writeln ('<o> Masukkan id buku : '); readln (id);
             lr._id := id;
-            {Input Judul Buku}
-            writeln ('<o> Masukkan judul buku : '); readln (title);
-            lr._title := title;
-            {Input Tanggal Kehilangan}
-            writeln ('<o> Masukkan tanggal pelaporan : '); readln (tanggal);
-            lr._reportDate := toDate (tanggal);
-            lr._username := loggedUser._username;
-            {Memeasukkan semua inputan kedalam list}
-            LostReportAppendList (listHilang, lr);
-            writeln('[o] Laporan diterima.');
+            BookSearchByID(bl, id, b, ib, found1);
+            BorrowHistSearchByIDUserStatus(bhl, id, loggedUser._username, 'belum', bh, ibh, found2);
+            if (found1) and (found2) then
+            begin
+                {Input Tanggal Kehilangan}
+                writeln ('<o> Masukkan tanggal pelaporan : '); readln (tanggal);
+                lr._reportDate := toDate (tanggal);
+                lr._username := loggedUser._username;
+                {Memeasukkan semua inputan kedalam list}
+                bhl.t[ibh]._status := 'hilang';
+                LostReportAppendList (listHilang, lr);
+                writeln('[o] Laporan diterima.');
+            end else if not (found1) then begin
+                writeln('[o] Tidak ada buku dengan id ', id, '.');
+            end else begin { not (found2) }
+                writeln('[o] Anda tidak meminjam buku ', b._title);
+            end;
         end;
 
     { F08 - Lihat Laporan bukua hilang }
@@ -652,7 +656,7 @@ implementation
             reset(flr);
             LostReportLoadListFromCSV(flr, lrl);
             close(flr);
-            wstBookStockProc(bl, bhl, lrl);
+            wstBookStockProc(bl, bhl);
             writeln('[i] File perpustakaan berhasil dimuat!')
         end;
 

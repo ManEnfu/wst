@@ -12,7 +12,7 @@ interface
     }
     type LostReport = record
         _id : integer;
-        _username, _title : string;
+        _username : string;
         _reportDate : Date;
     end;
 
