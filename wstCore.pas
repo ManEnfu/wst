@@ -50,7 +50,17 @@ interface
         { I.S. f sudah dibuka dengan mode reset/read, delimiter terdefinisi. }
         { F.S. d bernilai elemen pertama yang dibaca. }
     procedure readPass(var s : string);
+        { SPESIFIKASI : membaca input string dengan menyembunyikan string input kemudian 
+            mengenkripsi string tersebut. }
+        { I.S. - }
+        { F.S. string dienkripsi dan disimpan di variabel s. }
     function encryptPass(s : string) : string;
+        { SPESIFIKASI : mengembalikan string hasil enkripsi string s menggunakan base64. }
+    function compareString(s1, s2 : string) : integer;
+        { SPESIFIKASI : Membandingkan dua string secara leksikografis. mengembalikan :
+            1 : s1 > s2
+            0 : s1 = s2
+            -1 : s1 < s2 }
 
 implementation
     function isLeapYear(y : integer) : boolean;
@@ -229,37 +239,40 @@ implementation
         { SPESIFIKASI : Mengembalikan selisih hari dari dua tanggal d1 dan d2. }
         { KAMUS LOKAL }
         var
-            d, i : integer;
+            d, dd1, dd2, i : integer;
         { ALGORITMA }  
         begin
-            d := d1.d - d2.d;
-            if (d1.m > d2.m) then begin
-                for i := d2.m to (d1.m - 1) do begin
-                    d += maxDayOfMonth(i, d2.y);
-                end;
-            end else if (d1.m < d2.m) then begin
-                for i := d1.m to (d2.m - 1) do begin
-                    d -= maxDayOfMonth(i, d2.y);
-                end;
-            end; { else do nothing }
+            dd1 := d1.d;
+            i := 1;
+            while (i < d1.m) do begin
+                dd1 += maxDayOfMonth(i, d1.y);
+                i += 1;
+            end;
+            dd2 := d2.d;
+            i := 1;
+            while (i < d2.m) do begin
+                dd2 += maxDayOfMonth(i, d2.y);
+                i += 1;
+            end;
+            d := 0;
             if (d1.y > d2.y) then begin
                 for i := d2.y to (d1.y - 1) do begin
                     if (isLeapYear(i)) then begin
                         d += 366;
                     end else begin { not isLeapYear(i) }
-                        d += 355;
+                        d += 365;
                     end;
                 end;
-            end else if (d1.m < d2.m) then begin
-                for i := d1.m to (d2.m - 1) do begin
+            end else if (d1.y < d2.y) then begin
+                for i := d1.y to (d2.y - 1) do begin
                     if (isLeapYear(i)) then begin
                         d -= 366;
                     end else begin { not isLeapYear(i) }
-                        d -= 355;
+                        d -= 365;
                     end;
                 end;
             end; { else do nothing }
-            subDate := d;
+            subDate := d + dd1 - dd2;
         end;
 
     procedure readCSVStrDelim(var f : text; var s : string; delimiter : char);
@@ -441,5 +454,43 @@ implementation
                 e += b64[eb + 1];
             end;
             encryptPass := e;
+        end;
+
+    function compareString(s1, s2 : string) : integer;
+        { SPESIFIKASI : Membandingkan dua string secara leksikografis. mengembalikan :
+            1 : s1 > s2
+            0 : s1 = s2
+            -1 : s1 < s2 }
+        { KAMUS LOKAL }
+        var
+            ss1, ss2 : string;
+            i : integer;
+            stop : boolean;
+        { ALGORITMA }
+        begin
+            i := 1;
+            ss1 := upCase(s1);
+            ss2 := upCase(s2);
+            stop := false;
+            while (not stop) and (i <= length(ss1)) and (i <= length(ss2)) do begin
+                if (ss1[i] < ss2[i]) then begin
+                    compareString := -1;
+                    stop := true;
+                end else if (ss1[i] > ss2[i]) then begin
+                    compareString := 1;
+                    stop := true;
+                end else begin { ss1[i] = ss2[i] }
+                    i += 1;
+                end;
+            end;
+            if (not stop) then begin
+                if (length(ss1) < length(ss2)) then begin
+                    compareString := -1;
+                end else if (length(ss1) > length(ss2)) then begin
+                    compareString := 1;
+                end else begin { (length(ss1) < length(ss2)) }
+                    compareString := -1;
+                end;
+            end; { else do nothing }
         end;
 end.

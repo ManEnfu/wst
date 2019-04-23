@@ -68,7 +68,11 @@ interface
             bernilai false. }
         { I.S. bl dan id terdefinisi. }
         { F.S. b, i terdefinisi dan found = true jika ditemukan, found = false juka tidak ditemukan. }
-
+    procedure BookSortList(var bl : BookList);
+        { SPESIFIKASI : Mengurutkan Booklist bl secara leksikografis. }
+        { I.S. bl tidak terurut secara leksikografis. }
+        { F.S. bl terurut secara leksikografis. }
+    
 implementation
     procedure BookAssign(var b : book; id : integer; title, author : string; qty, year : integer; ctg : string);
         { SPESIFIKASI : Mengisi nilai pada Book b. }
@@ -183,6 +187,33 @@ implementation
                 found := true;
             end else begin { id <> bl.t[i]._id }
                 found := false;
+            end;
+        end;
+
+    procedure BookSortList(var bl : BookList);
+        { SPESIFIKASI : Mengurutkan Booklist bl secara leksikografis. }
+        { I.S. bl tidak terurut secara leksikografis. }
+        { F.S. bl terurut secara leksikografis. }
+        var
+            i, j : integer;
+            temp : Book;
+            swap : boolean;
+        begin
+            if (bl.Neff > 1) then begin
+                swap := true;
+                i := 1;
+                while (i < bl.Neff) and (swap) do begin
+                    swap := false;
+                    for j := bl.Neff downto i + 1 do begin
+                        if (compareString(bl.t[j]._title, bl.t[j - 1]._title) = -1) then begin
+                            temp := bl.t[j];
+                            bl.t[j] := bl.t[j - 1];
+                            bl.t[j - 1] := temp;
+                            swap := true;
+                        end;
+                    end;
+                    i += 1;
+                end;
             end;
         end;
 end.

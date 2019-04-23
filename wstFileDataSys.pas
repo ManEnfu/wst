@@ -181,8 +181,11 @@ implementation
     procedure wstSearchBookCategory(bl : Booklist);
         var
             i, count    : integer;
-            findbook    : string;  
+            findbook    : string;
+            bfl         : BookList;
         begin
+            bfl.Neff := 0;
+
             writeln('<o> Masukkan kategori: ');
             readln(findbook);
             
@@ -194,12 +197,18 @@ implementation
                     if (findbook = (bl.t[i]._category)) then
                     begin
                         count := count + 1;
-                        writeln((bl.t[i]._id), ' | ', (bl.t[i]._title), ' | ',  (bl.t[i]._author));
+                        BookAppendList(bfl, bl.t[i]);
                     end;
                 end;
                 if (count = 0) then 
                 begin
                     writeln('[o] Tidak ada buku dalam kategori ini.');
+                end else { count > 0 }
+                begin
+                    BookSortList(bfl);
+                    for i:=1 to bfl.Neff do begin
+                        writeln((bfl.t[i]._id), ' | ', (bfl.t[i]._title), ' | ',  (bfl.t[i]._author));
+                    end;
                 end;
             end else
             begin
@@ -212,8 +221,9 @@ implementation
         var
             tahun, i,a : integer;
             Kategori: char;
-            
+            bfl : BookList;
         begin
+            bfl.Neff := 0;
             a :=0;
             writeln('<o> Masukkan tahun: ');
             readln(tahun);
@@ -228,16 +238,18 @@ implementation
             begin
                 if (Kategori = '=') and (Tabbook.t[i]._year <> 0) then
                 begin 
-                    
-                    if (Tabbook.t[i]._year = tahun) then (writeln(Tabbook.t[i]._id, ' | ', Tabbook.t[i]._title, ' | ', Tabbook.t[i]._author)) ;
-                    a := a +1 ;
+                    if (Tabbook.t[i]._year = tahun) then
+                    begin
+                        BookAppendList(bfl, Tabbook.t[i]);
+                        a := a +1 ;
+                    end;
                 end
                 else
                 if (Kategori = '<') and (Tabbook.t[i]._year <> 0) then
                 begin 
                     if (Tabbook.t[i]._year < tahun) then 
                     begin
-                        (writeln(Tabbook.t[i]._id, ' | ', Tabbook.t[i]._title, ' | ', Tabbook.t[i]._author)) ;
+                        BookAppendList(bfl, Tabbook.t[i]);
                         a := a +1;
                     end
                 end
@@ -246,7 +258,7 @@ implementation
                 begin 
                     if (Tabbook.t[i]._year > tahun) then 
                     begin
-                        (writeln(Tabbook.t[i]._id, ' | ', Tabbook.t[i]._title, ' | ', Tabbook.t[i]._author)) ;
+                        BookAppendList(bfl, Tabbook.t[i]);
                         a := a +1;
                     end
                 end
@@ -255,7 +267,7 @@ implementation
                 begin 
                     if (Tabbook.t[i]._year <= tahun) then 
                     begin
-                        (writeln(Tabbook.t[i]._id, ' | ', Tabbook.t[i]._title, ' | ', Tabbook.t[i]._author)) ;
+                        BookAppendList(bfl, Tabbook.t[i]);
                         a := a +1;
                     end
                 end
@@ -264,13 +276,19 @@ implementation
                 begin 
                     if (Tabbook.t[i]._year >= tahun) then 
                     begin
-                        (writeln(Tabbook.t[i]._id, ' | ', Tabbook.t[i]._title, ' | ', Tabbook.t[i]._author)) ;
+                        BookAppendList(bfl, Tabbook.t[i]);
                         a := a +1;
                     end
                 end;
             end;
             if (a = 0) then begin
                 writeln('[o] Tidak ada buku dalam kategori ini.');
+            end else { a > 0 }
+            begin
+                BookSortList(bfl);
+                for i:=1 to bfl.Neff do begin
+                    writeln((bfl.t[i]._id), ' | ', (bfl.t[i]._title), ' | ',  (bfl.t[i]._author));
+                end;
             end;
         end;
 
@@ -380,19 +398,19 @@ implementation
         { ALGORITMA }
         begin
         {Memasukkan input data laporan kehilangan}
-                {Input ID Buku}
-                writeln ('<o> Masukkan id buku : '); readln (id);
-                lr._id := id;
-                {Input Judul Buku}
-                writeln ('<o> Masukkan judul buku : '); readln (title);
-                lr._title := title;
-                {Input Tanggal Kehilangan}
-                writeln ('<o> Masukkan tanggal pelaporan : '); readln (tanggal);
-                lr._reportDate := toDate (tanggal);
-                lr._username := loggedUser._username;
-                {Memeasukkan semua inputan kedalam list}
-                LostReportAppendList (listHilang, lr);
-                writeln('[o] Laporan diterima.');
+            {Input ID Buku}
+            writeln ('<o> Masukkan id buku : '); readln (id);
+            lr._id := id;
+            {Input Judul Buku}
+            writeln ('<o> Masukkan judul buku : '); readln (title);
+            lr._title := title;
+            {Input Tanggal Kehilangan}
+            writeln ('<o> Masukkan tanggal pelaporan : '); readln (tanggal);
+            lr._reportDate := toDate (tanggal);
+            lr._username := loggedUser._username;
+            {Memeasukkan semua inputan kedalam list}
+            LostReportAppendList (listHilang, lr);
+            writeln('[o] Laporan diterima.');
         end;
 
     { F08 - Lihat Laporan bukua hilang }

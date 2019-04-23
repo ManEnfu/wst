@@ -4,3 +4,5 @@ Username,ID_Buku,Tanggal_Peminjaman,Tanggal_Batas_Pengembalian,Status_Pengembali
 "wshitong997","234","29/12/2345","05/01/2346","sudah"
 "ggdude10","287","28/06/2010","05/07/2010","sudah"
 "ggdude10","376","12/04/2033","19/04/2033","belum"
+"ggdude10","476","12/02/2000","19/02/2000","sudah"
+"ggdude10","477","23/09/2300","30/09/2300","sudah"

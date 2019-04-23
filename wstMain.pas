@@ -147,7 +147,6 @@ var
     lrl : LostReportList;
     { Variabel sistem }
     loggedUser : User;
-    i : integer;
     s : string;
     isLogged: boolean;
 { ALGORITMA }
@@ -155,6 +154,7 @@ begin
     { Inisialisasi }
     s := '';
     isLogged := false;
+    loggedUser._username := '';
     { Menampilkan menu. }
     wstDispLogo();
     window(34, 1, 80, 25);
